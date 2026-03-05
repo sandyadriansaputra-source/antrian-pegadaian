@@ -1,51 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
     <title>Monitor Antrian Pegadaian</title>
     <style>
-        body { font-family: 'Arial', sans-serif; background: #007d3a; color: white; text-align: center; padding: 50px; }
-        .display { background: white; color: #333; padding: 40px; border-radius: 20px; display: inline-block; min-width: 400px; }
-        h1 { font-size: 150px; margin: 0; color: #007d3a; }
-        h2 { font-size: 40px; }
+        body { font-family: 'Arial', sans-serif; background: #007d3a; color: white; text-align: center; margin: 0; display: flex; flex-direction: column; justify-content: center; height: 100vh; }
+        .box { background: white; color: #333; padding: 50px; border-radius: 30px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        h1 { font-size: 200px; margin: 0; color: #007d3a; }
+        h2 { font-size: 50px; margin-bottom: 10px; color: #666; }
+        .footer { margin-top: 30px; font-size: 24px; }
     </style>
 </head>
 <body>
-    <div class="display">
+    <div class="box">
         <h2>NOMOR ANTRIAN</h2>
-        <h1 id="nomorBesar">---</h1>
-        <h2 id="namaNasabah">Menunggu...</h2>
+        <h1 id="nomorDisplay">---</h1>
+        <h2 id="namaDisplay">Menunggu...</h2>
     </div>
+    <div class="footer">Silakan menuju Loket Pelayanan</div>
 
     <script>
-        const scriptURL = 'PASTE_URL_ANDA_DI_SINI';
+        const scriptURL = 'PASTE_URL_WEB_APP_ANDA_DI_SINI';
         let nomorTerakhir = "";
 
-        function cekAntrian() {
+        function updateMonitor() {
             fetch(scriptURL)
             .then(res => res.json())
             .then(data => {
-                // Cari data yang statusnya "Dipanggil"
-                let antrianSekarang = data.reverse().find(row => row[2] === "Dipanggil");
+                // Mencari data terbaru yang statusnya "Dipanggil"
+                let antrian = data.reverse().find(row => row[2] === "Dipanggil");
                 
-                if (antrianSekarang && antrianSekarang[1] !== nomorTerakhir) {
-                    nomorTerakhir = antrianSekarang[1];
-                    document.getElementById('nomorBesar').innerText = antrianSekarang[1];
-                    document.getElementById('namaNasabah').innerText = antrianSekarang[0];
-                    suaraPanggilan(antrianSekarang[1]);
+                if (antrian && antrian[1] !== nomorTerakhir) {
+                    nomorTerakhir = antrian[1];
+                    document.getElementById('nomorDisplay').innerText = antrian[1];
+                    document.getElementById('namaDisplay').innerText = antrian[0];
+                    panggilSuara(antrian[1]);
                 }
             });
         }
 
-        function suaraPanggilan(nomor) {
-            let teks = `Nomor antrian ${nomor}, silakan menuju loket satu`;
-            let speech = new SpeechSynthesisUtterance(teks);
-            speech.lang = 'id-ID';
-            speech.rate = 0.8;
-            window.speechSynthesis.speak(speech);
+        function panggilSuara(nomor) {
+            let msg = new SpeechSynthesisUtterance(`Nomor antrian ${nomor}, silakan menuju loket`);
+            msg.lang = 'id-ID';
+            window.speechSynthesis.speak(msg);
         }
 
-        // Cek data setiap 5 detik secara otomatis
-        setInterval(cekAntrian, 5000);
+        // Cek perubahan data setiap 3 detik
+        setInterval(updateMonitor, 3000);
     </script>
 </body>
 </html>
