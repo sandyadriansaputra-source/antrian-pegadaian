@@ -63,21 +63,28 @@
     
     try {
         if (url.includes("v=")) {
-            // Untuk link standar: youtube.com/watch?v=ID
+            // Format: youtube.com/watch?v=ID
             videoId = url.split("v=")[1].split("&")[0];
         } else if (url.includes("youtu.be/")) {
-            // Untuk link pendek: youtu.be/ID
+            // Format: youtu.be/ID
             videoId = url.split("youtu.be/")[1].split("?")[0];
         } else if (url.includes("shorts/")) {
-            // Untuk link YouTube Shorts: youtube.com/shorts/ID
+            // Format: youtube.com/shorts/ID
             videoId = url.split("shorts/")[1].split("?")[0];
-        } else if (url.includes("embed/")) {
-            // Jika Anda sudah memasukkan link embed langsung
-            videoId = url.split("embed/")[1].split("?")[0];
-        } else if (url.includes("live/")) {
-            // Untuk link YouTube Live
-            videoId = url.split("live/")[1].split("?")[0];
         }
+
+        if (videoId) {
+            // Parameter mute=1 wajib ada agar autoplay diizinkan oleh browser
+            const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&rel=0`;
+            document.getElementById('youtubeVideo').src = embedUrl;
+            console.log("Video ID ditemukan: " + videoId);
+        } else {
+            console.error("ID Video tidak ditemukan dari link tersebut.");
+        }
+    } catch (e) {
+        console.error("Gagal memproses link YouTube:", e);
+    }
+}
 
         if (videoId) {
             // Gunakan parameter tgbNymZ7vqY agar video mengulang dan autoplay
