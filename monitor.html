@@ -59,15 +59,37 @@
 
         // Fungsi otomatis mengubah link biasa menjadi link embed agar bisa tampil di web
         function setYouTubeEmbed(url) {
-            let videoId = "";
-            if (url.includes("v=")) {
-                videoId = url.split("v=")[1].split("&")[0];
-            } else if (url.includes("youtu.be/")) {
-                videoId = url.split("youtu.be/")[1].split("?")[0];
-            }
-            const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}`;
-            document.getElementById('youtubeVideo').src = embedUrl;
+    let videoId = "";
+    
+    try {
+        if (url.includes("v=")) {
+            // Untuk link standar: youtube.com/watch?v=ID
+            videoId = url.split("v=")[1].split("&")[0];
+        } else if (url.includes("youtu.be/")) {
+            // Untuk link pendek: youtu.be/ID
+            videoId = url.split("youtu.be/")[1].split("?")[0];
+        } else if (url.includes("shorts/")) {
+            // Untuk link YouTube Shorts: youtube.com/shorts/ID
+            videoId = url.split("shorts/")[1].split("?")[0];
+        } else if (url.includes("embed/")) {
+            // Jika Anda sudah memasukkan link embed langsung
+            videoId = url.split("embed/")[1].split("?")[0];
+        } else if (url.includes("live/")) {
+            // Untuk link YouTube Live
+            videoId = url.split("live/")[1].split("?")[0];
         }
+
+        if (videoId) {
+            // Gunakan parameter tgbNymZ7vqY agar video mengulang dan autoplay
+            const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&rel=0`;
+            document.getElementById('youtubeVideo').src = embedUrl;
+        } else {
+            alert("Format link YouTube tidak dikenali. Pastikan link-nya benar ya!");
+        }
+    } catch (e) {
+        console.error("Gagal memproses video:", e);
+    }
+}
 
         function startMonitor() {
             document.getElementById('overlay').style.display = 'none';
