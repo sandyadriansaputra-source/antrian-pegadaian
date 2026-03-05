@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monitor Antrian Pegadaian</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background: #007d3a; color: white; text-align: center; padding: 50px; }
+        .display { background: white; color: #333; padding: 40px; border-radius: 20px; display: inline-block; min-width: 400px; }
+        h1 { font-size: 150px; margin: 0; color: #007d3a; }
+        h2 { font-size: 40px; }
+    </style>
+</head>
+<body>
+    <div class="display">
+        <h2>NOMOR ANTRIAN</h2>
+        <h1 id="nomorBesar">---</h1>
+        <h2 id="namaNasabah">Menunggu...</h2>
+    </div>
+
+    <script>
+        const scriptURL = 'PASTE_URL_ANDA_DI_SINI';
+        let nomorTerakhir = "";
+
+        function cekAntrian() {
+            fetch(scriptURL)
+            .then(res => res.json())
+            .then(data => {
+                // Cari data yang statusnya "Dipanggil"
+                let antrianSekarang = data.reverse().find(row => row[2] === "Dipanggil");
+                
+                if (antrianSekarang && antrianSekarang[1] !== nomorTerakhir) {
+                    nomorTerakhir = antrianSekarang[1];
+                    document.getElementById('nomorBesar').innerText = antrianSekarang[1];
+                    document.getElementById('namaNasabah').innerText = antrianSekarang[0];
+                    suaraPanggilan(antrianSekarang[1]);
+                }
+            });
+        }
+
+        function suaraPanggilan(nomor) {
+            let teks = `Nomor antrian ${nomor}, silakan menuju loket satu`;
+            let speech = new SpeechSynthesisUtterance(teks);
+            speech.lang = 'id-ID';
+            speech.rate = 0.8;
+            window.speechSynthesis.speak(speech);
+        }
+
+        // Cek data setiap 5 detik secara otomatis
+        setInterval(cekAntrian, 5000);
+    </script>
+</body>
+</html>
