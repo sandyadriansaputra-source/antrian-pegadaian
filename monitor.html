@@ -2,115 +2,63 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Monitor Antrian Pegadaian - Full Link YouTube</title>
+    <title>Monitor Antrian Pegadaian - Fix Final</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; font-family: 'Arial', sans-serif; background: #007d3a; overflow: hidden; }
         .container { display: flex; height: 100vh; width: 100vw; }
         
-        /* Sisi Kiri: Video */
-        .video-section { flex: 6; background: black; display: flex; align-items: center; justify-content: center; }
+        /* Layar YouTube */
+        .video-section { flex: 6; background: black; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* Sisi Kanan: Info Antrian */
-        .queue-section { flex: 4; display: flex; flex-direction: column; justify-content: center; align-items: center; background: white; color: #333; border-left: 10px solid #f9f9f9; }
-        h2 { font-size: 3rem; margin: 0; color: #666; }
+        /* Layar Nomor Antrian */
+        .queue-section { flex: 4; display: flex; flex-direction: column; justify-content: center; align-items: center; background: white; color: #333; }
         h1 { font-size: 10rem; margin: 10px 0; color: #007d3a; font-weight: bold; }
-        .nama-nasabah { font-size: 2.5rem; color: #444; font-style: italic; border-top: 2px solid #ddd; padding-top: 20px; }
+        h2 { font-size: 3rem; color: #666; margin: 0; }
+        .nama-nasabah { font-size: 2.5rem; color: #444; border-top: 2px solid #ddd; padding-top: 20px; width: 80%; text-align: center; }
 
-        /* Footer & Overlay */
-        .footer { position: absolute; bottom: 0; width: 100%; background: #005a2a; color: white; padding: 15px 0; font-size: 1.5rem; }
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; display: flex; justify-content: center; align-items: center; color: white; cursor: pointer; text-align: center; }
-        .btn-start { border: 3px solid white; padding: 20px 40px; border-radius: 15px; font-size: 2rem; }
+        /* Tombol Start (Wajib Klik) */
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; cursor: pointer; text-align: center; }
+        .btn-start { border: 4px solid #fff; padding: 30px; border-radius: 20px; font-size: 2.5rem; font-weight: bold; background: #007d3a; }
     </style>
 </head>
 <body>
 
     <div id="overlay" onclick="startMonitor()">
-        <div class="btn-start">KLIK UNTUK AKTIFKAN MONITOR</div>
+        <div class="btn-start">KLIK DI SINI UNTUK<br>MULAI MONITOR & VIDEO</div>
     </div>
 
     <div class="container">
         <div class="video-section">
-            <iframe id="youtubeVideo" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <iframe id="youtubeVideo" src="" allow="autoplay; encrypted-media"></iframe>
         </div>
-
         <div class="queue-section">
-            <div style="text-align: center;">
-                <h2>NOMOR ANTRIAN</h2>
-                <h1 id="nomorDisplay">---</h1>
-                <div class="nama-nasabah" id="namaDisplay">Menunggu...</div>
-            </div>
+            <h2>NOMOR ANTRIAN</h2>
+            <h1 id="nomorDisplay">---</h1>
+            <div class="nama-nasabah" id="namaDisplay">Menunggu...</div>
         </div>
-    </div>
-
-    <div class="footer">
-        <marquee>Selamat Datang di PT Pegadaian - Solusi Keuangan Terpercaya. Silakan menunggu nomor Anda dipanggil.</marquee>
     </div>
 
     <script>
-        // --- BAGIAN YANG PERLU ANDA UBAH ---
-const scriptURL = 'https://script.google.com/macros/s/AKfycbxr54D2wJB7Lp9Nx9au126J82orMSzEqOYjPAFc1XnprHUlmQ9h47eg3mzYkP0fXayr/exec';
-
-// MASUKKAN HANYA KODE ID VIDEO SAJA (KODE SETELAH v=)
-// Contoh: Jika linknya https://www.youtube.com/watch?v=tgbNymZ7vqY, maka kodenya 'tgbNymZ7vqY'
-const kodeVideoYouTube = 'sW_GoNs5GEo&list=PLJ7gnhfTxzw506uA8_gwPMdy47pyofhXp'; 
-// ----------------------------------
-
-function startMonitor() {
-    document.getElementById('overlay').style.display = 'none';
-    isStarted = true;
-    
-    // Langsung tembak ke link embed YouTube
-    const linkSakti = `https://www.youtube.com/embed/${kodeVideoYouTube}?autoplay=1&mute=1&loop=1&playlist=${kodeVideoYouTube}&rel=0&controls=0&showinfo=0`;
-    document.getElementById('youtubeVideo').src = linkSakti;
-    
-    updateMonitor();
-}
+        // --- 1. GANTI LINK GOOGLE SCRIPT ANDA DI SINI ---
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxr54D2wJB7Lp9Nx9au126J82orMSzEqOYjPAFc1XnprHUlmQ9h47eg3mzYkP0fXayr/exec';
+        
+        // --- 2. GANTI ID VIDEO YOUTUBE SAJA (CONTOH: P2Enn8Y2qCw) ---
+        // Jika linknya https://www.youtube.com/watch?v=P2Enn8Y2qCw
+        // Gunakan hanya kode belakangnya saja: 'P2Enn8Y2qCw'
+        const videoID = 'tgbNymZ7vqY'; 
 
         let nomorTerakhir = "";
         let isStarted = false;
 
-        // Fungsi otomatis mengubah link biasa menjadi link embed agar bisa tampil di web
-        function setYouTubeEmbed(url) {
-    let videoId = "";
-    try {
-        // Logika ekstraksi ID video yang lebih kuat
-        if (url.includes("v=")) {
-            videoId = url.split("v=")[1].split("&")[0];
-        } else if (url.includes("youtu.be/")) {
-            videoId = url.split("youtu.be/")[1].split("?")[0];
-        } else if (url.includes("shorts/")) {
-            videoId = url.split("shorts/")[1].split("?")[0];
-        }
-
-        if (videoId) {
-            // Menggunakan youtube-nocookie agar lebih ringan dan stabil
-            const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&rel=0&controls=0`;
-            document.getElementById('youtubeVideo').src = embedUrl;
-        } else {
-            console.error("ID Video tidak ditemukan.");
-        }
-    } catch (e) {
-        console.error("Gagal memproses link:", e);
-    }
-}
-
-        if (videoId) {
-            // Gunakan parameter tgbNymZ7vqY agar video mengulang dan autoplay
-            const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&rel=0`;
-            document.getElementById('youtubeVideo').src = embedUrl;
-        } else {
-            alert("Format link YouTube tidak dikenali. Pastikan link-nya benar ya!");
-        }
-    } catch (e) {
-        console.error("Gagal memproses video:", e);
-    }
-}
-
         function startMonitor() {
             document.getElementById('overlay').style.display = 'none';
             isStarted = true;
-            setYouTubeEmbed(linkYouTubeUtuh);
+            
+            // Set link video secara manual saat klik untuk memicu izin Autoplay
+            const finalURL = "https://www.youtube.com/embed/" + videoID + "?autoplay=1&mute=1&loop=1&playlist=" + videoID + "&rel=0&controls=0";
+            document.getElementById('youtubeVideo').src = finalURL;
+            
             updateMonitor();
         }
 
@@ -127,15 +75,16 @@ function startMonitor() {
                     panggilSuara(antrian[1]);
                 }
             })
-            .catch(err => console.error("Error:", err));
+            .catch(err => console.error("Koneksi Gagal:", err));
         }
 
         function panggilSuara(nomor) {
-            let msg = new SpeechSynthesisUtterance(`Nomor antrian ${nomor}, silakan menuju loket`);
+            let msg = new SpeechSynthesisUtterance("Nomor antrian " + nomor + ", silakan menuju loket");
             msg.lang = 'id-ID';
             window.speechSynthesis.speak(msg);
         }
 
+        // Cek data setiap 5 detik
         setInterval(updateMonitor, 5000);
     </script>
 </body>
