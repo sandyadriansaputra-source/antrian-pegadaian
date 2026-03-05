@@ -49,10 +49,23 @@
 
     <script>
         // --- BAGIAN YANG PERLU ANDA UBAH ---
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxr54D2wJB7Lp9Nx9au126J82orMSzEqOYjPAFc1XnprHUlmQ9h47eg3mzYkP0fXayr/exec';
-        const linkYouTubeUtuh = 'https://www.youtube.com/watch?v=tgbNymZ7vqY'; 
-        // Contoh: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-        // ----------------------------------
+const scriptURL = 'https://script.google.com/macros/s/AKfycbxr54D2wJB7Lp9Nx9au126J82orMSzEqOYjPAFc1XnprHUlmQ9h47eg3mzYkP0fXayr/exec';
+
+// MASUKKAN HANYA KODE ID VIDEO SAJA (KODE SETELAH v=)
+// Contoh: Jika linknya https://www.youtube.com/watch?v=tgbNymZ7vqY, maka kodenya 'tgbNymZ7vqY'
+const kodeVideoYouTube = 'tgbNymZ7vqY'; 
+// ----------------------------------
+
+function startMonitor() {
+    document.getElementById('overlay').style.display = 'none';
+    isStarted = true;
+    
+    // Langsung tembak ke link embed YouTube
+    const linkSakti = `https://www.youtube.com/embed/${kodeVideoYouTube}?autoplay=1&mute=1&loop=1&playlist=${kodeVideoYouTube}&rel=0&controls=0&showinfo=0`;
+    document.getElementById('youtubeVideo').src = linkSakti;
+    
+    updateMonitor();
+}
 
         let nomorTerakhir = "";
         let isStarted = false;
