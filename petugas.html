@@ -49,12 +49,14 @@
         }
 
         function panggil(nomor) {
-            alert("Memanggil nomor: " + nomor);
-            // Nanti di sini kita akan tambah logika suara
-        }
-
-        // Muat data otomatis saat halaman dibuka
-        muatData();
+    fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify({ "action": "panggil", "nomor": nomor })
+    }).then(() => {
+        alert("Memanggil " + nomor);
+        muatData(); // Refresh tabel
+    });
+}
     </script>
 </body>
 </html>
