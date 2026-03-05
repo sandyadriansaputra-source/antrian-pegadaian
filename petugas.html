@@ -29,34 +29,38 @@
     </table>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxr54D2wJB7Lp9Nx9au126J82orMSzEqOYjPAFc1XnprHUlmQ9h47eg3mzYkP0fXayr/exec'; // Gunakan URL Web App yang sama
+        const scriptURL = 'PASTE_URL_BARU_ANDA_DI_SINI'; // Pastikan URL-nya benar
 
-        function muatData() {
-            fetch(scriptURL)
-            .then(res => res.json())
-            .then(data => {
-                let html = '';
-                data.forEach(row => {
-                    html += `<tr>
-                        <td>${row[0]}</td>
-                        <td>${row[1]}</td>
-                        <td>${row[2]}</td>
-                        <td><button onclick="panggil('${row[1]}')">Panggil</button></td>
-                    </tr>`;
-                });
-                document.querySelector('#tabelAntrian tbody').innerHTML = html;
-            });
+function muatData() {
+    console.log("Sedang mengambil data...");
+    fetch(scriptURL)
+    .then(res => res.json())
+    .then(data => {
+        console.log("Data diterima:", data);
+        if (data.length === 0) {
+            alert("Koneksi berhasil, tapi tidak ada data di Google Sheets!");
+            return;
         }
-
-        function panggil(nomor) {
-    fetch(scriptURL, {
-        method: 'POST',
-        body: JSON.stringify({ "action": "panggil", "nomor": nomor })
-    }).then(() => {
-        alert("Memanggil " + nomor);
-        muatData(); // Refresh tabel
+        
+        let html = '';
+        data.forEach(row => {
+            // Pastikan row[0] adalah Nama, row[1] adalah Nomor, row[2] adalah Status
+            html += `<tr>
+                <td>${row[0] || '-'}</td>
+                <td>${row[1] || '-'}</td>
+                <td>${row[2] || '-'}</td>
+                <td><button onclick="panggil('${row[1]}')">Panggil</button></td>
+            </tr>`;
+        });
+        document.querySelector('#tabelAntrian tbody').innerHTML = html;
+    })
+    .catch(err => {
+        console.error("Error:", err);
+        alert("Gagal mengambil data. Cek apakah URL sudah benar dan 'Anyone' bisa akses.");
     });
 }
-    </script>
+muatData();
+        
+</script>
 </body>
 </html>
