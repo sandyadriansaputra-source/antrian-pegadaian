@@ -118,7 +118,7 @@
         function panggilSuara(n) {
             let speech = new SpeechSynthesisUtterance(`Nomor antrian ${n}, silakan menuju loket pelayanan`);
             speech.lang = 'id-ID';
-            speech.volume = currentVol; // Volume panggilan (0.1 - 1.0)
+            speech.volume = 1.0; // <--- DIKUNCI KE MAKSIMAL (TIDAK IKUT SHEET
             speech.rate = 0.85;
             window.speechSynthesis.speak(speech);
         }
