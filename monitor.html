@@ -3,16 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor Pegadaian - Full Audio Integration</title>
+    <title>Monitor Pegadaian - Full Audio & Recall Integration</title>
     <style>
         :root { --green-pegadaian: #007d3a; --green-darker: #004d24; --gold-pegadaian: #ffcc00; --dark-text: #333; }
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f0f0f0; overflow: hidden; }
         .container { display: flex; height: 100vh; width: 100vw; }
         .video-side { flex: 7; background: #000; border-right: 5px solid var(--gold-pegadaian); position: relative; padding-bottom: 45px; }
-        #playerYT { width: 100%; height: 100%; } /* Container Video */
+        #playerYT { width: 100%; height: 100%; } 
         .info-side { flex: 3; display: flex; flex-direction: column; background: white; padding-bottom: 45px; height: 100%; }
-        .header-right { background: var(--green-pegadaian); color: white; padding: 3vh; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 20vh; }
+        .header-right { 
+            background: var(--green-pegadaian); 
+            color: white; 
+            padding: 3vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 20vh; 
+        }
         .pegadaian-logo { max-width: 60%; height: auto; display: block; margin-bottom: 1.5vh; }
         .header-text { font-size: 3.5vh; font-weight: bold; margin: 0; line-height: 1.2; text-align: center; }
         .display-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
@@ -31,7 +40,8 @@
 
     <div class="container">
         <div class="video-side">
-            <div id="playerYT"></div> </div>
+            <div id="playerYT"></div> 
+        </div>
         <div class="info-side">
             <div class="header-right">
                 <img src="https://monev.pegadaian.co.id/userdata/profile_site/5662a273c270a215cdc46900d8a882f280e84b32c3f02.png" class="pegadaian-logo">
@@ -51,31 +61,24 @@
     <script src="https://www.youtube.com/iframe_api"></script>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbx5FP_boXKSdxpRa7Ecnu-laOiTRYnrcrVQKLzTd2hUgAlaZvvIMm34sXMpN_uO-qmF/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzVFCqEQdF_1zkv70WfpXiAurZH8QPPMrrUEKMoyBKezP15HvIHPKWBiiBMu9LBJdIF/exec';
         const linkYouTube = 'https://youtu.be/P2Enn8Y2qCw?list=RDP2Enn8Y2qCw';
         
-        let lastNum = "";
+        let lastCallID = ""; // Menggunakan ID Unik (Nomor + Timestamp)
         let isActive = false;
         let player;
-        let currentVol = 1.0;
 
         function extractVideoID(url) {
             return url.includes("v=") ? url.split("v=")[1].split("&")[0] : url.split("youtu.be/")[1].split("?")[0];
         }
 
-        // Inisialisasi Player YouTube API
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('playerYT', {
                 height: '100%',
                 width: '100%',
                 videoId: extractVideoID(linkYouTube),
-                playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0, 'loop': 1, 'playlist': extractVideoID(linkYouTube) },
-                events: { 'onReady': onPlayerReady }
+                playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0, 'loop': 1, 'playlist': extractVideoID(linkYouTube) }
             });
-        }
-
-        function onPlayerReady(event) {
-            // Player siap, tapi menunggu klik overlay untuk Play suara
         }
 
         function startSystem() {
@@ -91,25 +94,31 @@
             fetch(scriptURL)
             .then(res => res.json())
             .then(res => {
-                // 1. UPDATE RUNNING TEXT
+                // 1. UPDATE RUNNING TEXT & KECEPATAN
                 const ticker = document.getElementById('runText');
                 ticker.innerText = res.pengaturan.teks;
                 ticker.scrollAmount = res.pengaturan.speed;
 
-                // 2. UPDATE VOLUME YOUTUBE & PANGGILAN
-                currentVol = parseFloat(res.pengaturan.vol);
-                // Set Volume YouTube (0-100)
+                // 2. UPDATE VOLUME YOUTUBE (SESUAI SHEET)
+                let ytVol = parseFloat(res.pengaturan.vol);
                 if (player && player.setVolume) {
-                    player.setVolume(currentVol * 100); 
+                    player.setVolume(ytVol * 100); 
                 }
 
-                // 3. UPDATE ANTRIAN
+                // 3. LOGIKA DETEKSI ANTRIAN & PANGGIL ULANG
                 let latest = res.antrian.slice().reverse().find(row => row[2] === "Dipanggil");
-                if (latest && latest[1] !== lastNum) {
-                    lastNum = latest[1];
-                    document.getElementById('numDisplay').innerText = latest[1];
-                    document.getElementById('namaDisplay').innerText = latest[0];
-                    panggilSuara(latest[1]);
+                
+                if (latest) {
+                    // Buat ID Unik dari Nomor (Index 1) + Timestamp (Index 3)
+                    // Timestamp dari Kolom D di Sheet akan berubah setiap tombol Panggil Ulang diklik
+                    let currentCallID = latest[1] + (latest[3] || "");
+
+                    if (currentCallID !== lastCallID) {
+                        lastCallID = currentCallID;
+                        document.getElementById('numDisplay').innerText = latest[1];
+                        document.getElementById('namaDisplay').innerText = latest[0];
+                        panggilSuara(latest[1]);
+                    }
                 }
             })
             .catch(e => console.log("Reconnecting..."));
@@ -118,7 +127,7 @@
         function panggilSuara(n) {
             let speech = new SpeechSynthesisUtterance(`Nomor antrian ${n}, silakan menuju loket pelayanan`);
             speech.lang = 'id-ID';
-            speech.volume = 1.0; // <--- DIKUNCI KE MAKSIMAL (TIDAK IKUT SHEET
+            speech.volume = 1.0; // Tetap Maksimal untuk kejelasan layanan
             speech.rate = 0.85;
             window.speechSynthesis.speak(speech);
         }
