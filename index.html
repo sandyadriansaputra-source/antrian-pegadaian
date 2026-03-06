@@ -3,46 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antrian Pegadaian</title>
+    <title>Antrian Pegadaian - Ambil Nomor</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
-        input { width: 80%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
-        button { background-color: #007d3a; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
-        #nomerAntrian { font-size: 48px; font-weight: bold; color: #007d3a; margin-top: 20px; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; text-align: center; background-color: #f4f4f4; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        .logo { width: 150px; margin-bottom: 20px; }
+        h2 { color: #007d3a; margin-top: 0; }
+        input { width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+        input:focus { border-color: #007d3a; outline: none; }
+        button { background-color: #007d3a; color: white; padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: bold; width: 100%; transition: 0.3s; }
+        button:active { background-color: #004d24; transform: scale(0.98); }
+        #hasil { margin-top: 25px; border-top: 2px dashed #ddd; padding-top: 20px; }
+        #nomerAntrian { font-size: 60px; font-weight: 900; color: #007d3a; margin: 10px 0; }
     </style>
 </head>
 <body>
     <div class="card">
+        <img src="https://monev.pegadaian.co.id/userdata/profile_site/5662a273c270a215cdc46900d8a882f280e84b32c3f02.png" class="logo" alt="Logo Pegadaian">
         <h2>Ambil Antrian</h2>
-        <p>Masukkan nama Anda:</p>
+        <p>Silakan masukkan nama Anda:</p>
         <input type="text" id="inputNama" placeholder="Contoh: Budi">
-        <br>
-        <button onclick="kirimData()">Ambil Nomor</button>
+        <button id="btnAmbil" onclick="kirimData()">AMBIL NOMOR</button>
+
         <div id="hasil" style="display:none;">
-            <p>Nomor Antrian Anda:</p>
+            <p>NOMOR ANTRIAN ANDA:</p>
             <div id="nomerAntrian">...</div>
+            <p style="color: #666; font-size: 0.9rem;">Mohon tunggu hingga dipanggil oleh petugas.</p>
         </div>
     </div>
 
     <script>
-        // GANTI URL DI BAWAH INI DENGAN URL DARI GOOGLE APPS SCRIPT ANDA
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyHSvif67pUceGersxud6TBPoHo5GX8_fzVLQih5Ara3cTRPFGrTLRUrzJ0H-sGF-I_/exec';
+        // MASUKKAN URL WEB APP HASIL DEPLOY TERBARU ANDA
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxWfPdLzWqDke7VuaEO748L3_lySntFWYa1JDlS2n_nPoU4RtYR4hLGrW9kQJPXJbAK/exec';
 
         function kirimData() {
             const nama = document.getElementById('inputNama').value;
-            if(!nama) return alert("Isi nama dulu ya!");
+            const btn = document.getElementById('btnAmbil');
+            
+            if(!nama) return alert("Silakan isi nama Anda terlebih dahulu.");
 
-            fetch(scriptURL, {
-                method: 'POST',
-                body: JSON.stringify({ "action": "tambah", "nama": nama })
-            })
+            btn.disabled = true;
+            btn.innerText = "Mendaftarkan...";
+
+            // MENGGUNAKAN GET (Jauh lebih stabil untuk Apps Script)
+            fetch(scriptURL + "?aksi=tambah&nama=" + encodeURIComponent(nama))
             .then(response => response.json())
             .then(data => {
                 document.getElementById('hasil').style.display = 'block';
                 document.getElementById('nomerAntrian').innerText = data.nomor;
+                document.getElementById('inputNama').value = ""; // Kosongkan input
+                btn.disabled = false;
+                btn.innerText = "AMBIL NOMOR";
             })
-            .catch(error => console.error('Error!', error.message));
+            .catch(error => {
+                console.error('Error!', error.message);
+                alert("Gagal mengambil nomor. Pastikan URL Script benar dan sudah di-Deploy.");
+                btn.disabled = false;
+                btn.innerText = "AMBIL NOMOR";
+            });
         }
     </script>
 </body>
