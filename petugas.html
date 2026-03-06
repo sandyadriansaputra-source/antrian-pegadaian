@@ -3,64 +3,62 @@
 <head>
     <title>Panel Petugas - Pegadaian</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background-color: #e8f5e9; }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: #007d3a; color: white; }
-        button { background: #2196F3; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; }
-        button:hover { background: #1976D2; }
+        body { font-family: Arial; background: #f4f4f4; padding: 20px; text-align: center; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        h2 { color: #007d3a; }
+        .btn-panggil { background: #007d3a; color: white; border: none; padding: 15px 30px; font-size: 1.2rem; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 10px; }
+        .btn-panggil:active { background: #004d24; }
+        .status { margin-top: 15px; color: #666; font-style: italic; }
     </style>
 </head>
 <body>
-    <h1>Daftar Antrian Hari Ini</h1>
-    <button onclick="muatData()">Refresh Daftar</button>
-    <br><br>
-    <table id="tabelAntrian">
-        <thead>
-            <tr>
-                <th>Nama Nasabah</th>
-                <th>Nomor</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            </tbody>
-    </table>
 
-    <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbz0FTmwCdTvXaA1U0KsKLeroziPclX9zeeJDyITZkkWKOYKwsCmYkZDuJ92S98g9OSO/exec'; // Pastikan URL-nya benar
+<div class="card">
+    <img src="https://monev.pegadaian.co.id/userdata/profile_site/5662a273c270a215cdc46900d8a882f280e84b32c3f02.png" width="150">
+    <h2>LOKET PELAYANAN</h2>
+    <div id="infoAntrian">Memuat antrian...</div>
+    <button class="btn-panggil" onclick="panggilSekarang()">PANGGIL BERIKUTNYA</button>
+    <div class="status" id="statusPesan">Siap melayani.</div>
+</div>
 
-function muatData() {
-    console.log("Sedang mengambil data...");
-    fetch(scriptURL)
-    .then(res => res.json())
-    .then(data => {
-        console.log("Data diterima:", data);
-        if (data.length === 0) {
-            alert("Koneksi berhasil, tapi tidak ada data di Google Sheets!");
-            return;
-        }
-        
-        let html = '';
-        data.forEach(row => {
-            // Pastikan row[0] adalah Nama, row[1] adalah Nomor, row[2] adalah Status
-            html += `<tr>
-                <td>${row[0] || '-'}</td>
-                <td>${row[1] || '-'}</td>
-                <td>${row[2] || '-'}</td>
-                <td><button onclick="panggil('${row[1]}')">Panggil</button></td>
-            </tr>`;
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyHSvif67pUceGersxud6TBPoHo5GX8_fzVLQih5Ara3cTRPFGrTLRUrzJ0H-sGF-I_/exec';
+    let barisBerikutnya = -1;
+
+    function muatAntrian() {
+        fetch(scriptURL)
+        .then(res => res.json())
+        .then(res => {
+            // Cari antrian pertama yang statusnya masih kosong (belum dipanggil)
+            let data = res.antrian;
+            let index = data.findIndex((row, i) => i > 0 && row[2] === ""); 
+            
+            if (index !== -1) {
+                barisBerikutnya = index;
+                document.getElementById('infoAntrian').innerHTML = "<b>Nasabah Berikutnya:</b><br><h1 style='margin:10px 0'>" + data[index][1] + "</h1>" + data[index][0];
+                document.getElementById('statusPesan').innerText = "Silakan klik panggil.";
+            } else {
+                barisBerikutnya = -1;
+                document.getElementById('infoAntrian').innerText = "Tidak ada antrian menunggu.";
+            }
         });
-        document.querySelector('#tabelAntrian tbody').innerHTML = html;
-    })
-    .catch(err => {
-        console.error("Error:", err);
-        alert("Gagal mengambil data. Cek apakah URL sudah benar dan 'Anyone' bisa akses.");
-    });
-}
-muatData();
+    }
+
+    function panggilSekarang() {
+        if (barisBerikutnya === -1) return alert("Tidak ada antrian!");
         
+        document.getElementById('statusPesan').innerText = "Memanggil...";
+        
+        fetch(scriptURL + "?aksi=panggil&baris=" + barisBerikutnya)
+        .then(() => {
+            document.getElementById('statusPesan').innerText = "Panggilan terkirim ke monitor.";
+            muatAntrian(); // Segarkan data
+        });
+    }
+
+    // Muat data saat pertama buka
+    muatAntrian();
 </script>
+
 </body>
 </html>
