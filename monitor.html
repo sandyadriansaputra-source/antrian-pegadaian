@@ -2,132 +2,109 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Monitor Antrian Digital - PT Pegadaian</title>
+    <title>Monitor Antrian Pegadaian - Pro Mode</title>
     <style>
-        :root {
-            --primary-green: #007d3a;
-            --accent-gold: #ffcc00;
-            --bg-gray: #f4f7f6;
-            --text-dark: #333;
-        }
-
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-gray); overflow: hidden; }
+        :root { --green: #007d3a; --gold: #ffcc00; --dark: #333; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f4f4f4; overflow: hidden; }
         
-        /* Layout Utama */
-        .container { display: flex; height: 100vh; width: 100vw; flex-direction: row; }
-
-        /* Sisi Kiri: Video (Diberi Frame Modern) */
-        .video-section { flex: 7; background: #000; position: relative; border-right: 5px solid var(--accent-gold); }
-        iframe { width: 100%; height: 100%; border: none; }
-
-        /* Sisi Kanan: Info Antrian (Gaya Card Modern) */
-        .queue-section { flex: 3; display: flex; flex-direction: column; background: white; position: relative; }
+        /* Layout */
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .video-side { flex: 7; background: #000; border-right: 5px solid var(--gold); }
+        .info-side { flex: 3; display: flex; flex-direction: column; background: white; }
         
-        /* Header Sisi Kanan */
-        .header-right { background: var(--primary-green); color: white; padding: 20px; text-align: center; font-weight: bold; font-size: 1.5rem; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        /* Header Info */
+        .header-box { background: var(--green); color: white; padding: 25px; text-align: center; font-size: 1.8rem; font-weight: bold; }
+        
+        /* Nomor Antrian */
+        .display-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .label { font-size: 2.5rem; color: #666; margin-bottom: -15px; }
+        .number { font-size: 14rem; color: var(--green); font-weight: 900; margin: 0; }
+        .name { font-size: 2.5rem; color: var(--dark); background: #e8f5e9; padding: 15px 40px; border-radius: 50px; text-align: center; width: 80%; }
 
-        /* Card Nomor Antrian */
-        .queue-display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        .queue-label { font-size: 2rem; color: #666; text-transform: uppercase; font-weight: 600; margin-bottom: -10px; }
-        .queue-number { font-size: 12rem; color: var(--primary-green); font-weight: 900; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.05); }
-        .customer-name { font-size: 2.2rem; color: #444; font-weight: 500; padding: 15px 30px; border-radius: 50px; background: #e8f5e9; min-width: 250px; }
+        /* Ticker / Running Text */
+        .ticker-wrap { position: absolute; bottom: 0; width: 100%; background: #222; color: white; padding: 15px 0; font-size: 1.6rem; border-top: 4px solid var(--gold); }
 
-        /* Running Text (Gaya News Ticker) */
-        .footer-ticker { position: absolute; bottom: 0; width: 100%; background: #222; color: #fff; padding: 12px 0; font-size: 1.3rem; border-top: 4px solid var(--accent-gold); }
-
-        /* Overlay Awal */
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary-green), #004d24); z-index: 10000; display: flex; justify-content: center; align-items: center; color: white; cursor: pointer; text-align: center; }
-        .btn-start { border: 2px solid rgba(255,255,255,0.5); padding: 40px; border-radius: 30px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
-        .btn-start h2 { margin: 0; font-size: 2.5rem; }
+        /* Start Overlay */
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; cursor: pointer; }
+        .btn-start { border: 3px solid white; padding: 30px 60px; border-radius: 20px; background: var(--green); font-size: 2.5rem; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="overlay" onclick="jalankanMonitor()">
-        <div class="btn-start">
-            <h2>AKTIFKAN MONITOR PRO</h2>
-            <p>Klik untuk memulai layanan digital</p>
-        </div>
+    <div id="overlay" onclick="startSystem()">
+        <div class="btn-start">AKTIFKAN MONITOR UNIT</div>
     </div>
 
     <div class="container">
-        <div class="video-section">
-            <iframe id="iframeYouTube" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <div class="video-side">
+            <iframe id="playerYT" width="100%" height="100%" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
-
-        <div class="queue-section">
-            <div class="header-right">INFORMASI ANTRIAN</div>
-            <div class="queue-display">
-                <div class="queue-label">Nomor Antrian</div>
-                <h1 id="nomorDisplay">---</h1>
-                <div class="customer-name" id="namaDisplay">Menunggu...</div>
+        <div class="info-side">
+            <div class="header-box">ANTRIAN NASABAH</div>
+            <div class="display-area">
+                <div class="label">NOMOR</div>
+                <h1 id="numDisplay">---</h1>
+                <div class="name" id="nameDisplay">Menunggu...</div>
             </div>
-            
-            <div class="footer-ticker">
-                <marquee scrollamount="7">Selamat Datang di PT Pegadaian - Mengatasi Masalah Tanpa Masalah. Silakan gunakan aplikasi antrian digital untuk kenyamanan pelayanan Anda.</marquee>
+            <div class="ticker-wrap">
+                <marquee id="runText" scrollamount="7">Memuat informasi...</marquee>
             </div>
         </div>
     </div>
 
     <script>
-        // ISI KEMBALI URL DAN LINK ANDA DI SINI
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwSCp-Htc-P7hu3U_Z7hi6BaMnvIUlIQwGbmw2dIOfuam4XEnAetsbumXQm7fl-NWRa/exec';
-        const linkYouTubeUtuh = 'https://youtu.be/P2Enn8Y2qCw?list=RDP2Enn8Y2qCw';
+        // --- KONFIGURASI ---
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwFEZwuqFiI0BFd9NkEkerGVu9K6AwLc5940xBeoCnI8YE3Flyah0genZJE5JEzBmJZ/exec';
+        const linkYouTube = 'https://youtu.be/P2Enn8Y2qCw?list=RDP2Enn8Y2qCw';
+        // -------------------
 
-        let nomorTerakhir = "";
-        let isStarted = false;
+        let lastNum = "";
+        let isActive = false;
+        let currentVol = 1.0;
 
-        function prosesLinkYouTube(url) {
-            let idVideo = "";
-            if (url.includes("v=")) {
-                idVideo = url.split("v=")[1].split("&")[0];
-            } else if (url.includes("youtu.be/")) {
-                idVideo = url.split("youtu.be/")[1].split("?")[0];
-            }
-            return `https://www.youtube.com/embed/${idVideo}?autoplay=1&mute=1&loop=1&playlist=${idVideo}&rel=0&controls=0&showinfo=0`;
+        function getEmbed(url) {
+            let id = url.includes("v=") ? url.split("v=")[1].split("&")[0] : url.split("youtu.be/")[1].split("?")[0];
+            return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&rel=0&controls=0`;
         }
 
-        function jalankanMonitor() {
+        function startSystem() {
             document.getElementById('overlay').style.display = 'none';
-            isStarted = true;
-            document.getElementById('iframeYouTube').src = prosesLinkYouTube(linkYouTubeUtuh);
-            updateAntrian();
+            isActive = true;
+            document.getElementById('playerYT').src = getEmbed(linkYouTube);
+            syncData();
         }
 
-        setInterval(updateAntrian, 5000);
-    </script>function updateData() {
-    if (!isStarted) return;
-    
-    fetch(scriptURL)
-    .then(res => res.json())
-    .then(res => {
-        // Update Running Text & Kecepatan secara otomatis
-        const ticker = document.querySelector('marquee');
-        ticker.innerText = res.config.runningText;
-        ticker.scrollAmount = res.config.speed;
-        
-        // Simpan volume untuk panggilSuara
-        window.currentVolume = res.config.volume;
+        function syncData() {
+            if (!isActive) return;
+            fetch(scriptURL)
+            .then(res => res.json())
+            .then(res => {
+                // Update Settings dari Sheet
+                const ticker = document.getElementById('runText');
+                ticker.innerText = res.pengaturan.teks;
+                ticker.scrollAmount = res.pengaturan.speed;
+                currentVol = res.pengaturan.vol;
 
-        // Logika Panggil Antrian
-        let data = res.dataAntrian;
-        let antrian = data.slice().reverse().find(row => row[2] === "Dipanggil");
-        
-        if (antrian && antrian[1] !== nomorTerakhir) {
-            nomorTerakhir = antrian[1];
-            document.getElementById('nomorDisplay').innerText = antrian[1];
-            document.getElementById('namaDisplay').innerText = antrian[0];
-            panggilSuara(antrian[1]);
+                // Update Antrian
+                let latest = res.antrian.slice().reverse().find(row => row[2] === "Dipanggil");
+                if (latest && latest[1] !== lastNum) {
+                    lastNum = latest[1];
+                    document.getElementById('numDisplay').innerText = latest[1];
+                    document.getElementById('nameDisplay').innerText = latest[0];
+                    panggil(latest[1]);
+                }
+            })
+            .catch(e => console.log("Koneksi terputus..."));
         }
-    });
-}
 
-function panggilSuara(nomor) {
-    let msg = new SpeechSynthesisUtterance(`Nomor antrian ${nomor}, silakan menuju loket`);
-    msg.lang = 'id-ID';
-    msg.volume = window.currentVolume || 1.0; // Mengikuti pengaturan di Sheet
-    window.speechSynthesis.speak(msg);
-}
+        function panggil(n) {
+            let speech = new SpeechSynthesisUtterance(`Nomor antrian ${n}, silakan menuju loket`);
+            speech.lang = 'id-ID';
+            speech.volume = currentVol;
+            window.speechSynthesis.speak(speech);
+        }
 
+        setInterval(syncData, 5000);
+    </script>
 </body>
 </html>
