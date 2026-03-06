@@ -2,76 +2,109 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Monitor Antrian Pegadaian - Stabil</title>
+    <title>Monitor Antrian Pegadaian - Sistem Full Link</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; font-family: Arial; background: #007d3a; overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: Arial, sans-serif; background: #007d3a; overflow: hidden; }
         .container { display: flex; height: 100vh; width: 100vw; }
-        .video-section { flex: 6; background: black; }
-        .queue-section { flex: 4; display: flex; flex-direction: column; justify-content: center; align-items: center; background: white; color: #333; border-left: 5px solid #ddd; }
-        h1 { font-size: 10rem; margin: 0; color: #007d3a; font-weight: bold; }
-        h2 { font-size: 3rem; color: #666; }
+        
+        /* Sisi Kiri: Layar YouTube */
+        .video-section { flex: 6; background: black; display: flex; align-items: center; justify-content: center; }
+        iframe { width: 100%; height: 100%; border: none; }
+
+        /* Sisi Kanan: Nomor Antrian */
+        .queue-section { flex: 4; display: flex; flex-direction: column; justify-content: center; align-items: center; background: white; color: #333; border-left: 10px solid #f1f1f1; }
+        h2 { font-size: 3rem; margin: 0; color: #666; }
+        h1 { font-size: 12rem; margin: 10px 0; color: #007d3a; font-weight: bold; }
+        .nama-nasabah { font-size: 2.5rem; color: #444; font-style: italic; border-top: 2px solid #ddd; padding-top: 20px; width: 80%; text-align: center; }
+
+        /* Tombol Start (Wajib Klik) */
         #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; display: flex; justify-content: center; align-items: center; color: white; cursor: pointer; text-align: center; }
-        .btn-start { border: 4px solid white; padding: 30px; border-radius: 20px; font-size: 2rem; background: #007d3a; }
+        .btn-start { border: 4px solid white; padding: 30px; border-radius: 20px; font-size: 2rem; background: #007d3a; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="overlay" onclick="aktifkanMonitor()">
-        <div class="btn-start">KLIK DI SINI UNTUK<br>MULAI MONITOR</div>
+    <div id="overlay" onclick="jalankanMonitor()">
+        <div class="btn-start">KLIK DI SINI UNTUK<br>AKTIFKAN LAYAR MONITOR</div>
     </div>
 
     <div class="container">
         <div class="video-section">
-            <iframe id="layarYouTube" width="100%" height="100%" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <iframe id="iframeYouTube" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
+
         <div class="queue-section">
             <h2>NOMOR ANTRIAN</h2>
-            <h1 id="nomorBesar">---</h1>
-            <h3 id="namaNasabah" style="font-size: 2rem;">Menunggu...</h3>
+            <h1 id="nomorDisplay">---</h1>
+            <div class="nama-nasabah" id="namaDisplay">Menunggu...</div>
         </div>
     </div>
 
     <script>
-        // --- ATUR DI SINI ---
+        // ==========================================
+        // 1. TEMPEL LINK GOOGLE SCRIPT ANDA DI SINI
+        // ==========================================
         const scriptURL = 'https://script.google.com/macros/s/AKfycbxr54D2wJB7Lp9Nx9au126J82orMSzEqOYjPAFc1XnprHUlmQ9h47eg3mzYkP0fXayr/exec';
-        
-        // Gunakan ID video robot Google untuk tes: tgbNymZ7vqY
-        // Jika berhasil, ganti dengan ID video Pegadaian pilihan Anda
-        const videoID = 'sW_GoNs5GEo&list=PLJ7gnhfTxzw506uA8_gwPMdy47pyofhXp'; 
-        // -------------------
+
+        // ==========================================
+        // 2. TEMPEL LINK YOUTUBE UTUH DI SINI
+        // ==========================================
+        const linkYouTubeUtuh = 'https://youtu.be/P2Enn8Y2qCw?list=RDP2Enn8Y2qCw'; 
+        // ==========================================
 
         let nomorTerakhir = "";
+        let isStarted = false;
 
-        function aktifkanMonitor() {
-            document.getElementById('overlay').style.display = 'none';
-            // Panggil YouTube hanya setelah user melakukan klik
-            const embedUrl = `https://www.youtube.com/embed/${videoID}?autoplay=1&mute=1&loop=1&playlist=${videoID}&rel=0&controls=0`;
-            document.getElementById('layarYouTube').src = embedUrl;
+        // Mesin otomatis pemroses link utuh menjadi link embed
+        function prosesLinkYouTube(url) {
+            let idVideo = "";
+            if (url.includes("v=")) {
+                idVideo = url.split("v=")[1].split("&")[0];
+            } else if (url.includes("youtu.be/")) {
+                idVideo = url.split("youtu.be/")[1].split("?")[0];
+            }
             
-            setInterval(ambilData, 5000); // Update data setiap 5 detik
+            // Format link embed agar otomatis berputar (Autoplay & Mute)
+            return `https://www.youtube.com/embed/${idVideo}?autoplay=1&mute=1&loop=1&playlist=${idVideo}&rel=0`;
         }
 
-        function ambilData() {
+        function jalankanMonitor() {
+            document.getElementById('overlay').style.display = 'none';
+            isStarted = true;
+            
+            // Pasang link yang sudah diproses ke layar
+            document.getElementById('iframeYouTube').src = prosesLinkYouTube(linkYouTubeUtuh);
+            
+            updateAntrian();
+        }
+
+        function updateAntrian() {
+            if (!isStarted) return;
+
             fetch(scriptURL)
             .then(res => res.json())
             .then(data => {
-                // Mencari status "Dipanggil" di kolom ke-3 (index 2)
+                // Mencari antrian terbaru dengan status "Dipanggil"
                 let antrian = data.slice().reverse().find(row => row[2] === "Dipanggil");
+                
                 if (antrian && antrian[1] !== nomorTerakhir) {
                     nomorTerakhir = antrian[1];
-                    document.getElementById('nomorBesar').innerText = antrian[1];
-                    document.getElementById('namaNasabah').innerText = antrian[0];
+                    document.getElementById('nomorDisplay').innerText = antrian[1];
+                    document.getElementById('namaDisplay').innerText = antrian[0];
                     panggilSuara(antrian[1]);
                 }
             })
-            .catch(e => console.log("Gagal ambil data Sheets"));
+            .catch(err => console.log("Gagal memuat data antrian."));
         }
 
         function panggilSuara(nomor) {
-            let msg = new SpeechSynthesisUtterance("Nomor antrian " + nomor + ", silakan menuju loket pelayanan");
-            msg.lang = 'id-ID';
-            window.speechSynthesis.speak(msg);
+            let pesan = new SpeechSynthesisUtterance("Nomor antrian " + nomor + ", silakan menuju loket");
+            pesan.lang = 'id-ID';
+            window.speechSynthesis.speak(pesan);
         }
+
+        // Cek data setiap 5 detik
+        setInterval(updateAntrian, 5000);
     </script>
 </body>
 </html>
