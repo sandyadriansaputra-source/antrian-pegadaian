@@ -2,34 +2,23 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor Pegadaian - Full Audio & Recall Integration</title>
+    <title>Monitor Antrian - Pegadaian Pro</title>
     <style>
-        :root { --green-pegadaian: #007d3a; --green-darker: #004d24; --gold-pegadaian: #ffcc00; --dark-text: #333; }
+        :root { --green: #007d3a; --dark: #004d24; --gold: #ffcc00; }
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f0f0f0; overflow: hidden; }
         .container { display: flex; height: 100vh; width: 100vw; }
-        .video-side { flex: 7; background: #000; border-right: 5px solid var(--gold-pegadaian); position: relative; padding-bottom: 45px; }
-        #playerYT { width: 100%; height: 100%; } 
-        .info-side { flex: 3; display: flex; flex-direction: column; background: white; padding-bottom: 45px; height: 100%; }
-        .header-right { 
-            background: var(--green-pegadaian); 
-            color: white; 
-            padding: 3vh; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            min-height: 20vh; 
-        }
-        .pegadaian-logo { max-width: 60%; height: auto; display: block; margin-bottom: 1.5vh; }
-        .header-text { font-size: 3.5vh; font-weight: bold; margin: 0; line-height: 1.2; text-align: center; }
-        .display-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .number { font-size: 25vh; color: var(--green-pegadaian); font-weight: 900; margin: 0; line-height: 1; }
-        .name { font-size: 4vh; color: var(--dark-text); background: #e8f5e9; padding: 2vh 4vh; border-radius: 50px; text-align: center; width: 90%; margin-top: 2vh; }
-        .ticker-wrap { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--green-darker); color: white; padding: 10px 0; font-size: 3vh; border-top: 4px solid var(--gold-pegadaian); z-index: 999; }
+        .video-side { flex: 7; background: #000; border-right: 5px solid var(--gold); position: relative; padding-bottom: 45px; }
+        #playerYT { width: 100%; height: 100%; }
+        .info-side { flex: 3; display: flex; flex-direction: column; background: white; padding-bottom: 45px; }
+        .header-box { background: var(--green); color: white; padding: 3vh; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 20vh; }
+        .pegadaian-logo { max-width: 60%; height: auto; margin-bottom: 1vh; }
+        .display-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .number { font-size: 22vh; color: var(--green); font-weight: 900; margin: 0; line-height: 1; }
+        .name { font-size: 4vh; color: #333; background: #e8f5e9; padding: 2vh 4vh; border-radius: 50px; width: 90%; margin-top: 2vh; }
+        .ticker-wrap { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--dark); color: white; padding: 10px 0; font-size: 3vh; border-top: 4px solid var(--gold); z-index: 999; }
         #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; justify-content: center; align-items: center; color: white; cursor: pointer; }
-        .btn-start { border: 3px solid var(--gold-pegadaian); padding: 4vh 8vh; border-radius: 20px; background: var(--green-pegadaian); font-size: 5vh; font-weight: bold; }
+        .btn-start { border: 3px solid var(--gold); padding: 4vh 8vh; border-radius: 20px; background: var(--green); font-size: 4vh; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -39,32 +28,29 @@
     </div>
 
     <div class="container">
-        <div class="video-side">
-            <div id="playerYT"></div> 
-        </div>
+        <div class="video-side"><div id="playerYT"></div></div>
         <div class="info-side">
-            <div class="header-right">
+            <div class="header-box">
                 <img src="https://monev.pegadaian.co.id/userdata/profile_site/5662a273c270a215cdc46900d8a882f280e84b32c3f02.png" class="pegadaian-logo">
-                <h2 class="header-text">SISTEM ANTRIAN</h2>
+                <div style="font-size: 3vh; font-weight: bold;">SISTEM ANTRIAN</div>
             </div>
             <div class="display-area">
+                <div style="font-size: 4vh; color: #666; font-weight: 600;">NOMOR</div>
                 <h1 id="numDisplay" class="number">---</h1>
-                <div class="name" id="namaDisplay">Menunggu...</div>
+                <div id="nameDisplay" class="name">Menunggu...</div>
             </div>
         </div>
     </div>
 
-    <div class="ticker-wrap">
-        <marquee id="runText" scrollamount="7">Sinkronisasi data...</marquee>
-    </div>
+    <div class="ticker-wrap"><marquee id="runText" scrollamount="7">Sinkronisasi data...</marquee></div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzVFCqEQdF_1zkv70WfpXiAurZH8QPPMrrUEKMoyBKezP15HvIHPKWBiiBMu9LBJdIF/exec';
-        const linkYouTube = 'https://youtu.be/P2Enn8Y2qCw?list=RDP2Enn8Y2qCw';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxSlc6hT_8OVGjYWb7IH9uApOJKJD_c5Wo90P3ONHD4vzMH4azGEQ5lRRSmct9vEe3t/exec';
+        const linkYouTube = 'https://www.youtube.com/watch?v=P2Enn8Y2qCw';
         
-        let lastCallID = ""; // Menggunakan ID Unik (Nomor + Timestamp)
+        let lastCallID = ""; 
         let isActive = false;
         let player;
 
@@ -74,8 +60,7 @@
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('playerYT', {
-                height: '100%',
-                width: '100%',
+                height: '100%', width: '100%',
                 videoId: extractVideoID(linkYouTube),
                 playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0, 'loop': 1, 'playlist': extractVideoID(linkYouTube) }
             });
@@ -94,29 +79,24 @@
             fetch(scriptURL)
             .then(res => res.json())
             .then(res => {
-                // 1. UPDATE RUNNING TEXT & KECEPATAN
+                // 1. Running Text
                 const ticker = document.getElementById('runText');
                 ticker.innerText = res.pengaturan.teks;
                 ticker.scrollAmount = res.pengaturan.speed;
 
-                // 2. UPDATE VOLUME YOUTUBE (SESUAI SHEET)
-                let ytVol = parseFloat(res.pengaturan.vol);
-                if (player && player.setVolume) {
-                    player.setVolume(ytVol * 100); 
-                }
+                // 2. Volume YouTube
+                if (player && player.setVolume) { player.setVolume(parseFloat(res.pengaturan.vol) * 100); }
 
-                // 3. LOGIKA DETEKSI ANTRIAN & PANGGIL ULANG
+                // 3. Deteksi Panggilan (Kunci Panggil Ulang)
                 let latest = res.antrian.slice().reverse().find(row => row[2] === "Dipanggil");
-                
                 if (latest) {
-                    // Buat ID Unik dari Nomor (Index 1) + Timestamp (Index 3)
-                    // Timestamp dari Kolom D di Sheet akan berubah setiap tombol Panggil Ulang diklik
-                    let currentCallID = latest[1] + (latest[3] || "");
+                    // ID Unik = Nomor + Timestamp (Kolom D)
+                    let currentID = String(latest[1]) + String(latest[3] || "");
 
-                    if (currentCallID !== lastCallID) {
-                        lastCallID = currentCallID;
+                    if (currentID !== lastCallID) {
+                        lastCallID = currentID;
                         document.getElementById('numDisplay').innerText = latest[1];
-                        document.getElementById('namaDisplay').innerText = latest[0];
+                        document.getElementById('nameDisplay').innerText = latest[0];
                         panggilSuara(latest[1]);
                     }
                 }
@@ -125,9 +105,12 @@
         }
 
         function panggilSuara(n) {
+            // Berhentikan suara yang sedang berjalan (jika ada)
+            window.speechSynthesis.cancel();
+            
             let speech = new SpeechSynthesisUtterance(`Nomor antrian ${n}, silakan menuju loket pelayanan`);
             speech.lang = 'id-ID';
-            speech.volume = 1.0; // Tetap Maksimal untuk kejelasan layanan
+            speech.volume = 1.0; 
             speech.rate = 0.85;
             window.speechSynthesis.speak(speech);
         }
