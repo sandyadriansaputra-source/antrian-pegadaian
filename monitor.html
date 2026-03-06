@@ -2,31 +2,98 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Monitor Antrian Pegadaian - Pro Mode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor Antrian Pegadaian - Locked Version</title>
     <style>
-        :root { --green: #007d3a; --gold: #ffcc00; --dark: #333; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f4f4f4; overflow: hidden; }
+        :root { 
+            --green-pegadaian: #007d3a; 
+            --green-darker: #004d24; 
+            --gold-pegadaian: #ffcc00; 
+            --dark-text: #333; 
+        }
         
-        /* Layout */
-        .container { display: flex; height: 100vh; width: 100vw; }
-        .video-side { flex: 7; background: #000; border-right: 5px solid var(--gold); }
-        .info-side { flex: 3; display: flex; flex-direction: column; background: white; }
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f0f0f0; overflow: hidden; }
         
-        /* Header Info */
-        .header-box { background: var(--green); color: white; padding: 25px; text-align: center; font-size: 1.8rem; font-weight: bold; }
+        .container { display: flex; height: 100vh; width: 100vw; flex-direction: row; }
         
-        /* Nomor Antrian */
-        .display-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .label { font-size: 2.5rem; color: #666; margin-bottom: -15px; }
-        .number { font-size: 14rem; color: var(--green); font-weight: 900; margin: 0; }
-        .name { font-size: 2.5rem; color: var(--dark); background: #e8f5e9; padding: 15px 40px; border-radius: 50px; text-align: center; width: 80%; }
+        .video-side { flex: 7; background: #000; border-right: 5px solid var(--gold-pegadaian); position: relative; padding-bottom: 45px; }
+        iframe { width: 100%; height: 100%; border: none; }
 
-        /* Ticker / Running Text */
-        .ticker-wrap { position: absolute; bottom: 0; width: 100%; background: #222; color: white; padding: 15px 0; font-size: 1.6rem; border-top: 4px solid var(--gold); }
+        .info-side { flex: 3; display: flex; flex-direction: column; background: white; padding-bottom: 45px; height: 100%; }
+        
+        .header-right { 
+            background: var(--green-pegadaian); 
+            color: white; 
+            padding: 3vh; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-height: 20vh;
+        }
+        
+        .pegadaian-logo {
+            max-width: 60%;
+            height: auto;
+            display: block;
+            margin-bottom: 1.5vh;
+        }
+        
+        .header-text {
+            font-size: 3.5vh;
+            font-weight: bold;
+            margin: 0;
+            line-height: 1.2;
+            text-align: center;
+        }
+        
+        .display-area { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px;
+        }
+        
+        .label { font-size: 4vh; color: #777; font-weight: 600; margin-bottom: 1vh; }
+        .number { 
+            font-size: 25vh; 
+            color: var(--green-pegadaian); 
+            font-weight: 900; 
+            margin: 0; 
+            line-height: 1;
+        }
+        
+        .name { 
+            font-size: 4vh; 
+            color: var(--dark-text); 
+            background: #e8f5e9; 
+            padding: 2vh 4vh; 
+            border-radius: 50px; 
+            text-align: center; 
+            width: 90%; 
+            margin-top: 2vh;
+            word-wrap: break-word;
+        }
 
-        /* Start Overlay */
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; cursor: pointer; }
-        .btn-start { border: 3px solid white; padding: 30px 60px; border-radius: 20px; background: var(--green); font-size: 2.5rem; font-weight: bold; }
+        .ticker-wrap { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            background: var(--green-darker); 
+            color: white; 
+            padding: 10px 0; 
+            font-size: 3vh; 
+            border-top: 4px solid var(--gold-pegadaian); 
+            z-index: 999; 
+        }
+
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; justify-content: center; align-items: center; color: white; cursor: pointer; }
+        .btn-start { border: 3px solid var(--gold-pegadaian); padding: 4vh 8vh; border-radius: 20px; background: var(--green-pegadaian); font-size: 5vh; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -37,34 +104,42 @@
 
     <div class="container">
         <div class="video-side">
-            <iframe id="playerYT" width="100%" height="100%" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <iframe id="playerYT" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
+
         <div class="info-side">
-            <div class="header-box">ANTRIAN NASABAH</div>
+            <div class="header-right">
+                <img src="https://monev.pegadaian.co.id/userdata/profile_site/5662a273c270a215cdc46900d8a882f280e84b32c3f02.png" 
+                     alt="Logo PT Pegadaian" 
+                     class="pegadaian-logo">
+                <h2 class="header-text">SISTEM ANTRIAN</h2>
+            </div>
             <div class="display-area">
                 <div class="label">NOMOR</div>
-                <h1 id="numDisplay">---</h1>
-                <div class="name" id="nameDisplay">Menunggu...</div>
-            </div>
-            <div class="ticker-wrap">
-                <marquee id="runText" scrollamount="7">Memuat informasi...</marquee>
+                <h1 id="numDisplay" class="number">---</h1>
+                <div class="name" id="namaDisplay">Menunggu...</div>
             </div>
         </div>
     </div>
 
-    <script>
-        // --- KONFIGURASI ---
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwWsVY3hGDt_DXXDRQtJKnDwt9NUptaEJ658DFs5HzsQ6RgdmR8vc4jEhBfmOeiIBnQ/exec';
-        const linkYouTube = 'https://youtu.be/P2Enn8Y2qCw?list=RDP2Enn8Y2qCw';
-        // -------------------
+    <div class="ticker-wrap">
+        <marquee id="runText" scrollamount="7">Sinkronisasi data...</marquee>
+    </div>
 
+    <script>
+        // --- KONFIGURASI UNIT (KUNCI) ---
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbz0FTmwCdTvXaA1U0KsKLeroziPclX9zeeJDyITZkkWKOYKwsCmYkZDuJ92S98g9OSO/exec';
+        const linkYouTube = 'https://www.youtube.com/watch?v=P2Enn8Y2qCw'; 
+        // --------------------------------
+        
         let lastNum = "";
         let isActive = false;
         let currentVol = 1.0;
 
         function getEmbed(url) {
             let id = url.includes("v=") ? url.split("v=")[1].split("&")[0] : url.split("youtu.be/")[1].split("?")[0];
-            return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&rel=0&controls=0`;
+            // FIX: mute=0 agar suara muncul
+            return `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&loop=1&playlist=${id}&rel=0&controls=0`;
         }
 
         function startSystem() {
@@ -79,28 +154,27 @@
             fetch(scriptURL)
             .then(res => res.json())
             .then(res => {
-                // Update Settings dari Sheet
                 const ticker = document.getElementById('runText');
                 ticker.innerText = res.pengaturan.teks;
                 ticker.scrollAmount = res.pengaturan.speed;
                 currentVol = res.pengaturan.vol;
 
-                // Update Antrian
                 let latest = res.antrian.slice().reverse().find(row => row[2] === "Dipanggil");
                 if (latest && latest[1] !== lastNum) {
                     lastNum = latest[1];
                     document.getElementById('numDisplay').innerText = latest[1];
-                    document.getElementById('nameDisplay').innerText = latest[0];
-                    panggil(latest[1]);
+                    document.getElementById('namaDisplay').innerText = latest[0];
+                    panggilSuara(latest[1]);
                 }
             })
-            .catch(e => console.log("Koneksi terputus..."));
+            .catch(e => console.log("Reconnecting..."));
         }
 
-        function panggil(n) {
-            let speech = new SpeechSynthesisUtterance(`Nomor antrian ${n}, silakan menuju loket`);
+        function panggilSuara(n) {
+            let speech = new SpeechSynthesisUtterance(`Nomor antrian ${n}, silakan menuju loket pelayanan`);
             speech.lang = 'id-ID';
             speech.volume = currentVol;
+            speech.rate = 0.85;
             window.speechSynthesis.speak(speech);
         }
 
